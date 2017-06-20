@@ -1,7 +1,7 @@
 // KMP algorithm
-// arr[i] - size of longest matching prefix 
-// to sufix which ends at position i
-// indexed from 1 to n
+// arr[i] - maximum length of suffix finished at i 
+// that is equal to prefix (proper prefix - sufix)
+// string is indexed from 1 to n (it's length)
 // Complexity O(n)
 
 int t;
