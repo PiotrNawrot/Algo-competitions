@@ -1,0 +1,190 @@
+/* You can't connect the dots looking forward 
+   you can only connect them looking backwards. */
+
+#include<bits/stdc++.h>
+#define ll long long
+#define ld long double
+#define ull unsigned long long
+#define boost ios_base::sync_with_stdio(false);cin.tie(0);cout.tie(0);cout.precision(10);cout << fixed;
+#define dbset(x) for(int i=0 ; i<x.size(); i++) cerr << x[i] << " "; cerr << endl;
+#define inf 1000000007
+#define INF 1000000000000000000LL
+#define PI 3.14159265358979323846
+#define mod 1000000007
+#define mod1 1000696969
+#define flusz fflush(stdout);
+#define VI vector<int>
+#define VPI vector < pair<int,int> >
+#define PII pair<int, int>
+#define BIT bitset<N>
+#define st first
+#define nd second
+#define pb push_back
+#define mp make_pair
+#define eb emplace_back
+#define endl '\n'
+#define REP(x, y) for(int x = 0; x < (y); ++x)
+#define FOR(x, y, z) for(int x = y; x <= (z); ++x)
+#define FORR(x, y, z) for(int x = y; x >= (z); --x)
+using namespace std;
+
+template<class TH> void _dbg(const char *sdbg, TH h){cerr<<sdbg<<"="<<h<<"\n";}
+template<class TH, class... TA> void _dbg(const char *sdbg, TH h, TA... a) {
+  while(*sdbg!=',')cerr<<*sdbg++;cerr<<"="<<h<<","; _dbg(sdbg+1, a...);
+}
+#define debug(...) _dbg(#__VA_ARGS__, __VA_ARGS__)
+
+#define int long long
+#define N 2007
+
+int test;
+
+int n;
+
+int sumP[N],sumM[N];
+
+string t[N];
+
+int dp[N][N][12];
+
+int dp1[N][N][12];
+
+int sP(string x){
+    int res = 0;
+
+    REP(i,x.size()){
+        if (i%2){
+            res -= x[i]-'0';
+        }else{
+            res += x[i]-'0';
+        }
+    }
+
+    return res;
+}
+
+VI g,G;
+
+void solve()
+{
+    g.clear();G.clear();
+
+    cin >> n;
+    
+    int sum = 0;
+
+    FOR(i,1,n){
+        cin >> t[i];
+
+        if (t[i].size()%2){
+            g.pb(i);
+        }else{
+            G.pb(i);
+        }
+    }
+
+    FOR(i,0,n){
+        FOR(j,0,n){
+            FOR(l,0,10){
+                dp[i][j][l] = 0;
+                dp1[i][j][l] = 0;
+            }
+        }
+    }
+
+    FOR(i,1,n){
+        sumP[i] = sP(t[i]);
+        sumM[i] = -sumP[i];
+    }
+
+    dp[0][0][0] = 1;
+
+    int minus = g.size()/2;
+    int plus = g.size()-minus;
+
+    FOR(i,0,plus){
+        FOR(j,0,minus){
+            FOR(l,0,10){
+                if (i+j == plus+minus){
+                    continue;
+                }
+
+                int id = g[i+j];
+
+                dp[i+1][j][(l+sumP[id]+1100)%11] += dp[i][j][l] * (plus-i);
+                dp[i+1][j][(l+sumP[id]+1100)%11] %= mod;
+
+                dp[i][j+1][(l+sumM[id]+1100)%11] += dp[i][j][l] * (minus-j);
+                dp[i][j+1][(l+sumM[id]+1100)%11] %= mod;
+            }
+        }
+    }
+
+    FOR(i,0,10){
+        dp1[0][0][i] = dp[plus][minus][i];
+    }
+
+    if (g.size()%2==0){
+        plus++;
+    }else{
+        minus++;
+    }
+
+    int m = G.size();
+
+    if (g.size()){
+        FOR(i,0,m){
+            FOR(j,0,m){
+                FOR(l,0,10){
+                    if (i+j >= m){
+                        continue;
+                    }
+
+                    int id = G[i+j];
+
+                    dp1[i+1][j][(l+sumP[id]+1100)%11] += dp1[i][j][l] * (i+plus);
+                    dp1[i+1][j][(l+sumP[id]+1100)%11] %= mod;
+
+                    dp1[i][j+1][(l+sumM[id]+1100)%11] += dp1[i][j][l] * (j+minus);
+                    dp1[i][j+1][(l+sumM[id]+1100)%11] %= mod;
+                }
+            }
+        }
+    }else{
+        dp1[0][0][0] = 1;
+
+        REP(i,G.size()){
+            int id = G[i];
+
+            FOR(l,0,10){
+                dp1[i+1][0][(l+sumP[id]+1100)%11] += dp1[i][0][l] * (G.size()-i);
+                dp1[i+1][0][(l+sumP[id]+1100)%11] %= mod;
+            }
+        }
+    }
+
+    int res = 0;
+
+    FOR(i,0,G.size()){
+        res += dp1[i][G.size()-i][0];
+        res %= mod;
+    }
+
+    cout << res;
+
+    return;
+}
+
+int32_t main()
+{
+    boost
+
+    test = 1;
+
+    while(test--)
+    {
+        solve();
+    }
+
+  return 0;
+}
