@@ -1,0 +1,211 @@
+#include<bits/stdc++.h>
+#define ll long long
+#define ld long double
+#define ull unsigned long long
+#define boost ios_base::sync_with_stdio(false);cin.tie(0);cout.precision(10);cout << fixed;
+#define dbset(x) for(int i=0 ; i<x.size(); i++) cerr << x[i] << " "; cerr << endl;
+#define inf 2000000007
+#define INF 1000000000000000000LL
+#define PI 3.14159265358979323846
+#define mod 1000000007
+#define mod1 1000696969
+#define flusz fflush(stdout);
+#define VI vector<int>
+#define VPI vector < pair<int,int> >
+#define PII pair<int, int>
+#define BIT bitset<N>
+#define st first
+#define nd second
+#define pb push_back
+#define mp make_pair
+#define eb emplace_back
+#define endl '\n'
+#define REP(x, y) for(int x = 0; x < (y); ++x)
+#define FOR(x, y, z) for(int x = y; x <= (z); ++x)
+#define FORR(x, y, z) for(int x = y; x >= (z); --x)
+using namespace std;
+ 
+template<class TH> void _dbg(const char *sdbg, TH h){cerr<<sdbg<<"="<<h<<"\n";}
+template<class TH, class... TA> void _dbg(const char *sdbg, TH h, TA... a) {
+  while(*sdbg!=',')cerr<<*sdbg++;cerr<<"="<<h<<","; _dbg(sdbg+1, a...);
+}
+#define debug(...) _dbg(#__VA_ARGS__, __VA_ARGS__)
+ 
+#define N 300007
+ 
+int test;
+ 
+int n,q;
+ 
+VI g[N];
+ 
+int a,b,c,x;
+ 
+int start; // wierzhcolek startowy
+ 
+int last_ans;
+ 
+int res_min,res_max;
+ 
+unordered_map <int,int> m; // przenumerowanie
+
+int t[N];
+
+int node_id[N]; // wskaznik na trie w danym wierzcholku
+ 
+int cou; // do odmierzania nowych wierzcholkow
+int cou1; // do nowych nodow
+
+int l[32*N],r[32*N],sum[32*N];
+
+int ileBit = 31;
+
+int insert(int id,int val,int pot){
+    int nr = ++cou1;
+
+    l[nr] = l[id];
+    r[nr] = r[id];
+
+    if (pot == -1){
+        sum[nr]++;
+        return nr;
+    }
+
+    if (val&(1<<pot)){
+        l[nr] = insert(l[nr],val,pot-1);
+    }else{
+        r[nr] = insert(r[nr],val,pot-1);
+    }
+
+    sum[nr] = sum[l[nr]] + sum[r[nr]];
+
+    return nr; 
+}
+
+int query_min(int id,int val,int pot){
+    if (id == 0 || pot == -1){
+        return val;
+    }
+
+    if (val&(1<<pot)){
+        if (sum[l[id]]){
+            return query_min(l[id],val^(1<<pot),pot-1);
+        }else{
+            return (1<<pot)+query_min(r[id],val^(1<<pot),pot-1);
+        }
+    }else{
+        if (sum[r[id]]){
+            return query_min(r[id],val,pot-1);
+        }else{
+            return (1<<pot)+query_min(l[id],val,pot-1);
+        }
+    }
+}   
+
+int query_max(int id,int val,int pot){
+    if (id == 0 || pot == -1){
+        return val;
+    }
+
+    if (val&(1<<pot)){
+        if (sum[r[id]]){
+            return (1<<pot)+query_max(r[id],val^(1<<pot),pot-1);
+        }else{
+            return query_max(l[id],val^(1<<pot),pot-1);
+        }
+    }else{
+        if (sum[l[id]]){
+            return (1<<pot)+query_max(l[id],val,pot-1);
+        }else{
+            return query_max(r[id],val,pot-1);
+        }
+    }
+}
+
+void dfs(int v,int p){
+    node_id[v] = insert(node_id[p],t[v],ileBit);
+
+    for(auto it:g[v]){
+        if (it!=p){
+            dfs(it,v);
+        }
+    }
+}
+ 
+void solve()
+{
+    cin >> n >> q;
+ 
+    cin >> start;
+ 
+    cou++;
+ 
+    m[start]=cou;
+ 
+    cin >> t[cou];
+ 
+    FOR(i,1,n-1){
+        cin >> a >> b;
+ 
+        m[a] = ++cou;
+        
+        a = cou;
+        b = m[b];
+
+        g[a].pb(b);
+        g[b].pb(a);
+
+        cin >> t[a];
+    }
+
+    dfs(1,1);
+ 
+    FOR(i,1,q){
+        cin >> x;
+ 
+        x^=last_ans;
+ 
+        if (x==0){
+            cin >> a >> b >> c; // v, u, k  nowe u podlaczam do v z value k
+ 
+            a ^= last_ans;b ^= last_ans;c ^= last_ans;
+ 
+            m[b] = ++cou;
+
+            b = cou;
+            a = m[a];
+
+            node_id[b] = insert(node_id[a],c,ileBit);
+        }else{
+            cin >> a >> b; // v k
+ 
+            a ^= last_ans;
+            b ^= last_ans;
+ 
+            a = m[a];
+ 
+            res_min = query_min(node_id[a],b,ileBit);
+            res_max = query_max(node_id[a],b,ileBit);
+ 
+            cout << res_min << " " << res_max << endl;
+ 
+            last_ans = res_min ^ res_max;
+        }
+    }
+ 
+    return;
+}
+ 
+int32_t main()
+{
+    boost
+ 
+    test=1;
+ 
+    while(test--)
+    {
+        solve();
+    }
+ 
+  return 0;
+}
