@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "nanoT5"
 url: "https://github.com/PiotrNawrot/nanoT5"
-version: 1.0.0
+version: v1.0.0
 authors:
 - family-names: "Nawrot"
   given-names: "Piotr"
